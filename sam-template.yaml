@@ -1,5 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
+Transform:
+  - AWS::Serverless-2016-10-31
+  - ALKSify
 Description: Sends log data from CloudWatch Logs and S3 to New Relic Infrastructure (Cloud integrations) and New Relic Logging.
 Parameters:
   NRLicenseKey:
@@ -8,7 +10,7 @@ Parameters:
     Default: "YOUR_LICENSE_KEY"
 
 Resources:
-  NewRelicLogIngestionFunction:
+  NewRelicLogIngestion:
     Type: 'AWS::Serverless::Function'
     Properties:
       Runtime: python3.6
@@ -21,11 +23,12 @@ Resources:
       Environment:
         Variables: 
           LICENSE_KEY: !Ref NRLicenseKey
+          LOGGING_ENABLED: true
 
   LambdaInvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !Ref NewRelicLogIngestionFunction
+      FunctionName: !Ref NewRelicLogIngestion
       Action: lambda:InvokeFunction
       Principal: !Sub logs.${AWS::Region}.amazonaws.com
       SourceArn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
